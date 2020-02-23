@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/spf13/newApp/cmd"
+import "github.com/christianvozar/labelmaker/cmd"
 
 func main() {
 	cmd.Execute()
