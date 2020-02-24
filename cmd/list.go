@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"text/tabwriter"
 	// "text/tabwriter"
 
 	"github.com/christianvozar/labelmaker/pkg/labelmaker"
@@ -47,35 +48,12 @@ Ex: labelmaker list github/semantic`,
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-/*
-sample query
-{
-  repository(name: "dotfiles", owner: "christianvozar") {
-    labels(first: 50) {
-      nodes {
-        color
-        name
-      }
-    }
-  }
-}
-
-*/
 
 func queryAllLabels(r string) {
-	fmt.Printf("%v", r)
+	w := tabwriter.NewWriter(os.Stdout, 8, 8, 2, '\t', 0)
+	defer w.Flush()
+
 	if r == "" {
 		fmt.Println("No repository specified.")
 		return
@@ -110,6 +88,11 @@ func queryAllLabels(r string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(query.Repository.Labels)
+
+	fmt.Fprintf(w, "\n%s\t%s", "Label", "Color")
+	for _, l := range query.Repository.Labels.Nodes {
+		// It would be wicked to support coloring the colors with their values using escape codes.
+		fmt.Fprintf(w, "\n%s\t%s", l.Name, l.Color)
+	}
 	return
 }
